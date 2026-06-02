@@ -1,0 +1,46 @@
+{
+  "by_embedding": {
+    "TriviaQA": {
+      "Contriever": 0.7651,
+      "MiniLM": 0.6555
+    },
+    "SQuAD": {
+      "Contriever": 0.8248,
+      "MiniLM": 0.687
+    }
+  },
+  "by_chunking": {
+    "TriviaQA": {
+      "Fixed": 0.6985,
+      "Semantic": 0.7222
+    },
+    "SQuAD": {
+      "Fixed": 0.749,
+      "Semantic": 0.7628
+    }
+  },
+  "by_postprocessing": {
+    "TriviaQA": {
+      "No PP": 0.802,
+      "Dot Product": 0.6878,
+      "Cosine": 0.6412
+    },
+    "SQuAD": {
+      "No PP": 0.838,
+      "Dot Product": 0.7244,
+      "Cosine": 0.7054
+    }
+  },
+  "embedding_x_pp_TriviaQA": {
+    "Contriever": {
+      "No PP": 0.802,
+      "Dot Product": 0.7933,
+      "Cosine": 0.7001
+    },
+    "MiniLM": {
+      "No PP": 0.802,
+      "Dot Product": 0.5823,
+      "Cosine": 0.5823
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "overview": "CA-RAG runs in three sequential phases: Indexing, Generation, and Post-Processing. Unlike standard RAG it stores no vector database and performs no top-k retrieval; every chunk is sent to the LLM, and relevance is judged after generation by comparing each answer to its source chunk.",
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Indexing Phase",
+      "goal": "Turn raw documents into clean, coherent chunks.",
+      "steps": [
+        "Pre-process: replace escape sequences (\\n) with spaces, normalise repeated punctuation and whitespace, strip artifacts (\\xa0, brackets, backslashes), rejoin hyphen-split words.",
+        "Chunk with one of two strategies and emit a chunk list C1, C2, C3 ..."
+      ],
+      "chunking_methods": [
+        {"name": "Semantic chunking (proposed)", "detail": "Segment sentences with spaCy en_core_web_sm, L2-normalise each sentence embedding, compute dot-product similarity to the previous sentence, and start a new chunk when similarity drops below theta = 0.3. Preserves topical coherence; produces fewer, larger, meaningful chunks."},
+        {"name": "Fixed-size chunking (baseline)", "detail": "Tokenise with the Zephyr-7B-Beta tokenizer and split into non-overlapping 512-token windows. Simple and uniform, but may split related content across boundaries; produces more chunks overall."}
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Generation Phase",
+      "goal": "Produce one candidate answer per chunk.",
+      "steps": [
+        "For each chunk Ci, build a structured prompt p combining chunk + prompt + question Q.",
+        "Instruct Zephyr-7B-Beta to answer strictly from the provided context; if the chunk lacks evidence, respond with the exact phrase 'no context provided' (the abstention protocol).",
+        "Model config: 4-bit quantization (BitsAndBytes), 4,096-token context window, greedy decoding (do_sample=False) for reproducibility.",
+        "Output the candidate answer set A = {a1, a2, ..., an}."
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Post-Processing Phase",
+      "goal": "Select the single most contextually grounded answer and filter out hallucinations.",
+      "steps": [
+        "Vector embedding: embed each answer ai and its source chunk Ci with all-MiniLM-L6-v2 or Contriever-msmarco.",
+        "Similarity score: compute cosine similarity (magnitude-invariant) or dot product (magnitude-sensitive) between answer and chunk.",
+        "Filter: keep ai only if sim(ai, Ci) >= tau (tau = 0.6); if nothing passes, return 'no context provided'.",
+        "Select: sort the filtered set by similarity descending and return the highest-scoring answer a*."
+      ],
+      "rationale": "Similarity is measured against the source chunk (not the question) because the answer was generated conditioned on both question and chunk, so the user's intent is already encoded. Comparing to the chunk acts as a factual grounding check that catches answers produced from the model's parametric memory."
+    }
+  ],
+  "evaluation": "Performance is measured with BERTScore (RoBERTa-large backbone), reporting Precision, Recall and F1. BERTScore compares contextual token embeddings via greedy cosine matching, capturing semantic equivalence and paraphrase — well suited to open-domain QA where correct answers may be phrased differently from the reference."
+}

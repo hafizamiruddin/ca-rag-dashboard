@@ -1,0 +1,34 @@
+{
+  "title": "Context-Aware Retrieval-Augmented Generation Model for Document Question Answering",
+  "short_title": "CA-RAG for Document QA",
+  "project_id": "17002R",
+  "programme": "Final Year Project 1 · Bachelor of Computer Science (BCS)",
+  "institution": "Kulliyyah of Information & Communication Technology, International Islamic University Malaysia (IIUM)",
+  "semester": "Semester 2, 2025/2026",
+  "supervisor": "Prof. Dr. Amelia Ritahani Binti Ismail",
+  "authors": [
+    {"name": "Mifzal Amzar bin Mohd Faizar", "matric": "2310949", "email": "mifzalamzar@gmail.com"},
+    {"name": "Muhammad Hafiz bin Amiruddin", "matric": "2319051", "email": "hafizishikawa@gmail.com"}
+  ],
+  "abstract": "Document Question Answering requires extracting precise answers from long, unstructured documents. LLMs are limited by frozen training knowledge, context-window constraints, and hallucination. Standard RAG grounds generation in retrieved passages but its top-k retrieval bottleneck can exclude evidence spread across a document. This project implements and evaluates CA-RAG, which removes the retrieval filter entirely and instead validates each candidate answer against its source chunk using cosine similarity or dot product after generation. Two chunking strategies (semantic, fixed-size) and two embedding models (all-MiniLM-L6-v2, Contriever-msmarco) are crossed on TriviaQA and SQuAD, evaluated by BERTScore. Semantic chunking with Contriever and dot-product scoring gives the strongest TriviaQA result (F1 = 0.7941); the embedding model is the dominant factor, with MiniLM filtering collapsing under the fixed tau = 0.6 threshold while Contriever stays competitive.",
+  "objectives": [
+    "Develop a CA-RAG model using semantic and fixed chunking strategies for document question answering.",
+    "Enhance the CA-RAG model with cosine and dot-product similarity methods for retrieving relevant contextual information.",
+    "Analyse CA-RAG performance using retrieval and generation evaluation metrics."
+  ],
+  "problem_statement": "Standard RAG relies on a top-k retriever that selects only a few chunks before generation. When the evidence for a question is spread across multiple sections of a long document, the retriever often excludes relevant chunks and the LLM is forced to answer from incomplete context, producing incomplete or hallucinated responses. There is no built-in mechanism to verify whether a generated answer is actually grounded in the source text.",
+  "community_impacts": [
+    {"domain": "Healthcare", "detail": "Query clinical guidelines & research; grounded answers reduce the risk of misinformation."},
+    {"domain": "Law", "detail": "Search contracts & case documents; only context-backed answers are returned for legal accuracy."},
+    {"domain": "Education", "detail": "Answer questions from textbooks; students & teachers query long papers in seconds."}
+  ],
+  "sdg": ["SDG 4 — Quality Education", "SDG 9 — Industry, Innovation and Infrastructure"],
+  "tools": ["Python", "Hugging Face Transformers", "Zephyr-7B-Beta", "spaCy", "sentence-transformers", "BitsAndBytes (4-bit)", "BERTScore"],
+  "key_references": [
+    "Collini, E., Kurniadi, F. I., Nesi, P., & Pantaleo, G. (2025). Context-aware retrieval augmented generation using similarity validation to handle context inconsistencies in large language models. IEEE Access, 13, 170065-170080.",
+    "Gao, Y. et al. (2023). Retrieval-augmented generation for large language models: A survey. arXiv:2312.10997.",
+    "Lewis, P. et al. (2020). Retrieval-augmented generation for knowledge-intensive NLP tasks. NeurIPS 33.",
+    "Heydari, M. H. et al. (2024). Context awareness gate for retrieval augmented generation. arXiv:2411.16133.",
+    "Zhang, T. et al. (2020). BERTScore: Evaluating text generation with BERT. ICLR."
+  ]
+}

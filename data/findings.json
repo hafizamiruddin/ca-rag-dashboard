@@ -1,0 +1,70 @@
+{
+  "headline_conclusions": [
+    "The embedding model is the dominant factor in post-processing quality: Contriever-msmarco enables effective similarity filtering, while all-MiniLM-L6-v2 collapses under the fixed tau = 0.6 threshold.",
+    "Under Contriever embeddings, dot product outperforms cosine similarity on TriviaQA (0.7941 vs 0.7187 with semantic chunking), especially when chunk length is heterogeneous.",
+    "Semantic and fixed-size chunking perform comparably on these short-context benchmarks; semantic chunking is expected to help more on longer, structurally complex documents."
+  ],
+  "findings": [
+    {
+      "id": "post-processing-collapse",
+      "title": "MiniLM post-processing collapses under a fixed threshold",
+      "dimension": "Effect of Post-Processing",
+      "summary": "Adding similarity filtering with all-MiniLM-L6-v2 sharply lowers BERTScore. Semantic + MiniLM falls from 0.8019 (No PP) to 0.6083 on TriviaQA; fixed-size falls from 0.8022 to 0.5563. The same collapse appears on SQuAD (0.8366 to 0.6154).",
+      "explanation": "MiniLM is a lightweight sentence-pair model and tends to assign systematically lower similarity to valid answer-chunk pairs. With a fixed tau = 0.6, many correctly grounded answers fall below threshold and are discarded as 'no context provided', driving up false negatives and lowering both precision and recall.",
+      "evidence": {"TriviaQA": {"MiniLM No PP": 0.8019, "MiniLM Cosine/Dot": 0.6083}, "SQuAD": {"MiniLM No PP": 0.8366, "MiniLM Cosine/Dot": 0.6154}},
+      "tag": "counter-intuitive vs Collini et al. (2025)"
+    },
+    {
+      "id": "embedding-dominant",
+      "title": "Contriever is the right encoder for the validation step",
+      "dimension": "Effect of Embedding Model",
+      "summary": "With Contriever-msmarco, filtering stays competitive: semantic cosine 0.7187 and dot 0.7941 on TriviaQA; fixed-size 0.6815 and 0.7925. Dot product nearly matches the No-PP baseline while still filtering hallucinations.",
+      "explanation": "Contriever was trained with a contrastive objective on passage retrieval, so its embedding space is better calibrated for measuring answer-to-passage alignment. The threshold tau is therefore not universal — it must be calibrated to the score distribution of the chosen embedding model.",
+      "evidence": {"TriviaQA mean F1": {"Contriever": 0.7651, "MiniLM": 0.6555}, "SQuAD mean F1": {"Contriever": 0.8248, "MiniLM": 0.6870}},
+      "tag": "embedding choice > everything else"
+    },
+    {
+      "id": "cosine-vs-dot",
+      "title": "Cosine = dot for MiniLM; dot wins for Contriever",
+      "dimension": "Cosine Similarity vs Dot Product",
+      "summary": "MiniLM yields identical scores for cosine and dot product across every configuration. Contriever shows a real gap, largest on TriviaQA fixed-size: cosine 0.6815 vs dot 0.7925 (delta 0.0754).",
+      "explanation": "MiniLM L2-normalises embeddings by default, so for unit vectors cosine and dot product are algebraically the same and produce identical rankings. Contriever embeddings are not perfectly normalised; longer, denser chunks get larger magnitudes, and dot product's magnitude sensitivity rewards those relevant chunks, more so under heterogeneous fixed-size chunks.",
+      "evidence": {"MiniLM": "cosine == dot (all configs)", "Contriever fixed TriviaQA": {"cosine": 0.6815, "dot": 0.7925}},
+      "tag": "normalisation explains the tie"
+    },
+    {
+      "id": "chunking",
+      "title": "Chunking strategy barely moves the needle here",
+      "dimension": "Effect of Chunking Strategy",
+      "summary": "Without post-processing, fixed-size is marginally higher on both datasets. With Contriever dot-product, semantic leads on TriviaQA (0.7941 vs 0.7925) while fixed-size edges SQuAD (0.8378 vs 0.8365). Differences are small.",
+      "explanation": "TriviaQA and SQuAD are short-context benchmarks, so 512-token fixed chunks usually already contain the evidence without splitting it. On long, structured scientific documents, semantic chunking's topical coherence is expected to matter much more. Fixed-size also produces many more chunks, increasing generation time on a single GPU.",
+      "evidence": {"No PP TriviaQA": {"Fixed": 0.8022, "Semantic": 0.8019}, "Contriever Dot TriviaQA": {"Semantic": 0.7941, "Fixed": 0.7925}},
+      "tag": "short-context benchmarks mask the gap"
+    },
+    {
+      "id": "dataset",
+      "title": "SQuAD scores higher than TriviaQA everywhere",
+      "dimension": "TriviaQA vs SQuAD",
+      "summary": "Across all 12 configurations SQuAD beats TriviaQA. Example: Contriever dot semantic is 0.7941 (TriviaQA) vs 0.8365 (SQuAD).",
+      "explanation": "SQuAD is extractive — the gold answer is a span present verbatim in the provided passage, so Zephyr-7B-Beta matches reference phrasing closely. TriviaQA needs cross-sentence reasoning over longer, web-sourced contexts, making generation and reference matching harder. The MiniLM collapse still hits SQuAD, confirming threshold miscalibration (not dataset difficulty) is the main driver.",
+      "evidence": {"Contriever Dot Semantic": {"TriviaQA": 0.7941, "SQuAD": 0.8365}},
+      "tag": "extractive vs reasoning"
+    }
+  ],
+  "behavioural_notes": {
+    "caveat": "A higher raw BERTScore for No-PP does not necessarily mean better grounding — without filtering, the model may return fluent answers from parametric memory rather than genuinely grounded ones. That is exactly the hallucination risk the similarity filter is meant to catch.",
+    "abstention": "TriviaQA abstention ('no context provided') ranges from 13.2% (Contriever + Fixed + Dot) to 35.8% (MiniLM + Fixed). Fewer answers attempted is not automatically safer."
+  },
+  "limitations": [
+    "Preliminary sample sizes are small (5-50 per configuration), introducing variance.",
+    "Standard RAG baselines (RAG + MiniLM, RAG + Contriever, RAG + Reranker) are not yet implemented.",
+    "Fixed tau = 0.6 is not calibrated per embedding model; MiniLM likely needs a lower threshold.",
+    "Per-question latency was not yet recorded systematically for a cost comparison."
+  ],
+  "next_steps": [
+    "Scale to at least 200 samples per configuration per dataset.",
+    "Implement the full set of standard RAG baselines with the same Zephyr-7B-Beta generator.",
+    "Examine MiniLM vs Contriever similarity-score distributions to derive a model-specific threshold.",
+    "Record processing time per configuration for a fair computational-cost comparison."
+  ]
+}

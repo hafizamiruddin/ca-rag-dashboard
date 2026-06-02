@@ -1,0 +1,295 @@
+{
+  "meta": {
+    "project_id": "17002R",
+    "title": "Context-Aware Retrieval-Augmented Generation Model for Document Question Answering",
+    "generator_model": "Zephyr-7B-Beta (4-bit quantization)",
+    "embedding_models": [
+      "all-MiniLM-L6-v2",
+      "Contriever-msmarco"
+    ],
+    "chunking": [
+      "Semantic (spaCy en_core_web_sm, theta=0.3)",
+      "Fixed-size (512 tokens, Zephyr tokenizer)"
+    ],
+    "post_processing": [
+      "None",
+      "Cosine similarity",
+      "Dot product"
+    ],
+    "threshold_tau": 0.6,
+    "datasets": [
+      "TriviaQA",
+      "SQuAD"
+    ],
+    "metric": "BERTScore (RoBERTa-large): Precision / Recall / F1",
+    "hardware": "1x NVIDIA RTX 4090 (24GB VRAM)",
+    "samples_per_config": "5-50 (preliminary)",
+    "note_predictions": "Per-question predictions available for TriviaQA only (500 each)."
+  },
+  "configurations": [
+    {
+      "config": "Contriever + Fixed + No PP",
+      "embedding": "CONTRIEVER",
+      "embeddingLabel": "Contriever",
+      "chunking": "Fixed",
+      "pp": "None",
+      "ppLabel": "No PP",
+      "triviaqa": {
+        "prec": 0.7893,
+        "rec": 0.8173,
+        "f1": 0.8022
+      },
+      "squad": {
+        "prec": 0.8088,
+        "rec": 0.8731,
+        "f1": 0.8394
+      },
+      "trivia_reject_pct": 24.4,
+      "trivia_grounding_pct": 55.2,
+      "trivia_avg_answer_len": 38.0,
+      "n_questions": 500
+    },
+    {
+      "config": "MiniLM + Fixed + No PP",
+      "embedding": "MINILM",
+      "embeddingLabel": "MiniLM",
+      "chunking": "Fixed",
+      "pp": "None",
+      "ppLabel": "No PP",
+      "triviaqa": {
+        "prec": 0.7893,
+        "rec": 0.8173,
+        "f1": 0.8022
+      },
+      "squad": {
+        "prec": 0.8088,
+        "rec": 0.8731,
+        "f1": 0.8394
+      },
+      "trivia_reject_pct": 24.4,
+      "trivia_grounding_pct": 55.2,
+      "trivia_avg_answer_len": 38.0,
+      "n_questions": 500
+    },
+    {
+      "config": "MiniLM + Semantic + No PP",
+      "embedding": "MINILM",
+      "embeddingLabel": "MiniLM",
+      "chunking": "Semantic",
+      "pp": "None",
+      "ppLabel": "No PP",
+      "triviaqa": {
+        "prec": 0.7865,
+        "rec": 0.8195,
+        "f1": 0.8019
+      },
+      "squad": {
+        "prec": 0.8079,
+        "rec": 0.8681,
+        "f1": 0.8366
+      },
+      "trivia_reject_pct": 19.2,
+      "trivia_grounding_pct": 59.6,
+      "trivia_avg_answer_len": 41.2,
+      "n_questions": 500
+    },
+    {
+      "config": "Contriever + Semantic + No PP",
+      "embedding": "CONTRIEVER",
+      "embeddingLabel": "Contriever",
+      "chunking": "Semantic",
+      "pp": "None",
+      "ppLabel": "No PP",
+      "triviaqa": {
+        "prec": 0.7865,
+        "rec": 0.8195,
+        "f1": 0.8019
+      },
+      "squad": {
+        "prec": 0.8079,
+        "rec": 0.8681,
+        "f1": 0.8366
+      },
+      "trivia_reject_pct": 19.2,
+      "trivia_grounding_pct": 59.6,
+      "trivia_avg_answer_len": 41.2,
+      "n_questions": 500
+    },
+    {
+      "config": "Contriever + Semantic + Dot Product",
+      "embedding": "CONTRIEVER",
+      "embeddingLabel": "Contriever",
+      "chunking": "Semantic",
+      "pp": "dot",
+      "ppLabel": "Dot Product",
+      "triviaqa": {
+        "prec": 0.7775,
+        "rec": 0.8129,
+        "f1": 0.7941
+      },
+      "squad": {
+        "prec": 0.8062,
+        "rec": 0.8697,
+        "f1": 0.8365
+      },
+      "trivia_reject_pct": 17.4,
+      "trivia_grounding_pct": 56.0,
+      "trivia_avg_answer_len": 49.8,
+      "n_questions": 500
+    },
+    {
+      "config": "Contriever + Fixed + Dot Product",
+      "embedding": "CONTRIEVER",
+      "embeddingLabel": "Contriever",
+      "chunking": "Fixed",
+      "pp": "dot",
+      "ppLabel": "Dot Product",
+      "triviaqa": {
+        "prec": 0.7744,
+        "rec": 0.8129,
+        "f1": 0.7925
+      },
+      "squad": {
+        "prec": 0.8072,
+        "rec": 0.8714,
+        "f1": 0.8378
+      },
+      "trivia_reject_pct": 13.2,
+      "trivia_grounding_pct": 62.2,
+      "trivia_avg_answer_len": 49.6,
+      "n_questions": 500
+    },
+    {
+      "config": "Contriever + Semantic + Cosine",
+      "embedding": "CONTRIEVER",
+      "embeddingLabel": "Contriever",
+      "chunking": "Semantic",
+      "pp": "cosine",
+      "ppLabel": "Cosine",
+      "triviaqa": {
+        "prec": 0.7029,
+        "rec": 0.7366,
+        "f1": 0.7187
+      },
+      "squad": {
+        "prec": 0.8062,
+        "rec": 0.8697,
+        "f1": 0.8365
+      },
+      "trivia_reject_pct": 19.6,
+      "trivia_grounding_pct": 52.4,
+      "trivia_avg_answer_len": 46.7,
+      "n_questions": 500
+    },
+    {
+      "config": "Contriever + Fixed + Cosine",
+      "embedding": "CONTRIEVER",
+      "embeddingLabel": "Contriever",
+      "chunking": "Fixed",
+      "pp": "cosine",
+      "ppLabel": "Cosine",
+      "triviaqa": {
+        "prec": 0.6649,
+        "rec": 0.7002,
+        "f1": 0.6815
+      },
+      "squad": {
+        "prec": 0.7336,
+        "rec": 0.7933,
+        "f1": 0.7621
+      },
+      "trivia_reject_pct": 21.0,
+      "trivia_grounding_pct": 58.0,
+      "trivia_avg_answer_len": 43.9,
+      "n_questions": 500
+    },
+    {
+      "config": "MiniLM + Semantic + Cosine",
+      "embedding": "MINILM",
+      "embeddingLabel": "MiniLM",
+      "chunking": "Semantic",
+      "pp": "cosine",
+      "ppLabel": "Cosine",
+      "triviaqa": {
+        "prec": 0.5942,
+        "rec": 0.6241,
+        "f1": 0.6083
+      },
+      "squad": {
+        "prec": 0.5922,
+        "rec": 0.6409,
+        "f1": 0.6154
+      },
+      "trivia_reject_pct": 32.4,
+      "trivia_grounding_pct": 46.6,
+      "trivia_avg_answer_len": 38.0,
+      "n_questions": 500
+    },
+    {
+      "config": "MiniLM + Semantic + Dot Product",
+      "embedding": "MINILM",
+      "embeddingLabel": "MiniLM",
+      "chunking": "Semantic",
+      "pp": "dot",
+      "ppLabel": "Dot Product",
+      "triviaqa": {
+        "prec": 0.5942,
+        "rec": 0.6241,
+        "f1": 0.6083
+      },
+      "squad": {
+        "prec": 0.5922,
+        "rec": 0.6409,
+        "f1": 0.6154
+      },
+      "trivia_reject_pct": 32.4,
+      "trivia_grounding_pct": 46.6,
+      "trivia_avg_answer_len": 38.0,
+      "n_questions": 500
+    },
+    {
+      "config": "MiniLM + Fixed + Cosine",
+      "embedding": "MINILM",
+      "embeddingLabel": "MiniLM",
+      "chunking": "Fixed",
+      "pp": "cosine",
+      "ppLabel": "Cosine",
+      "triviaqa": {
+        "prec": 0.5418,
+        "rec": 0.5726,
+        "f1": 0.5563
+      },
+      "squad": {
+        "prec": 0.5845,
+        "rec": 0.6331,
+        "f1": 0.6077
+      },
+      "trivia_reject_pct": 35.8,
+      "trivia_grounding_pct": 48.6,
+      "trivia_avg_answer_len": 32.4,
+      "n_questions": 500
+    },
+    {
+      "config": "MiniLM + Fixed + Dot Product",
+      "embedding": "MINILM",
+      "embeddingLabel": "MiniLM",
+      "chunking": "Fixed",
+      "pp": "dot",
+      "ppLabel": "Dot Product",
+      "triviaqa": {
+        "prec": 0.5418,
+        "rec": 0.5726,
+        "f1": 0.5563
+      },
+      "squad": {
+        "prec": 0.5845,
+        "rec": 0.6331,
+        "f1": 0.6077
+      },
+      "trivia_reject_pct": 35.8,
+      "trivia_grounding_pct": 48.6,
+      "trivia_avg_answer_len": 32.4,
+      "n_questions": 500
+    }
+  ]
+}
